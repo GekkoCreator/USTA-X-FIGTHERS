@@ -7,21 +7,57 @@ Created on Tue May  9 15:03:28 2023
 import streamlit as st
 import pandas as pd
 import numpy as np
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import sqlite3
 
+ 
+
+scope = ['https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive"]
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name('sheets.json', scope)
+client = gspread.authorize(credentials)
+
+#spreadsheet = client.create('figthersbd')
+
+spreadsheet = client.open('figthersbd')
+
+#spreadsheet.share('jfernandoardila10@gmail.com', perm_type='user', role='writer')
+
+class RowData:
+    def __init__(self, user, title, comment):
+        self.user = user
+        self.title = title
+        self.comment = comment
+        
+worksheet = spreadsheet.sheet1
+
+# Define the headers
+headers = ['user', 'title', 'comment']
+
+# Insert the headers in the first row
+#worksheet.append_row(headers)
+
+user_values = worksheet.col_values(1)  # Column A
+title_values = worksheet.col_values(2)  # Column B
+comment_values = worksheet.col_values(3)  # Column C
 
 
+rows = []
+        
 
 # Definimos las páginas de nuestra aplicación
 pagina_inicio = "Inicio"
 pagina_infoproyecto = "Nuestro proyecto"
 pagina_personajes= "Personajes"
+pagina_prueba="ForoFigthers"
 
 
 # Creamos un selectbox en la barra lateral para seleccionar la página
 pagina_seleccionada = st.sidebar.selectbox(
     "Selecciona una página",
-    [pagina_inicio, pagina_infoproyecto, pagina_personajes]
+    [pagina_inicio, pagina_infoproyecto, pagina_personajes, pagina_prueba]
 )
 
 
@@ -29,6 +65,7 @@ st.experimental_set_query_params(pagina=pagina_seleccionada)
 
 # Mostramos el contenido de la página seleccionada
 if pagina_seleccionada == pagina_inicio:
+        st.snow()
     
  
         st.markdown("<h1 style='text-align: center;'>USTA X-FIGTHERS</h1>", unsafe_allow_html=True)
@@ -58,6 +95,9 @@ if pagina_seleccionada == pagina_inicio:
        
         st.write('')
         
+        
+
+        
         col1, col2, col3 = st.columns(3)
         
         with col1: 
@@ -66,7 +106,7 @@ if pagina_seleccionada == pagina_inicio:
             urlsantoto = 'https://www.ustabuca.edu.co/'
             
             st.image(santotoprl, use_column_width=True, output_format='png')
-            if st.button("Satoto page"):
+            if st.button("Santoto page"):
                 st.write("¡Hiciste clic en la imagen!")
                 st.markdown(f'<a href="{urlsantoto}" target="_blank">Haz clic aquí</a>', unsafe_allow_html=True)
             
@@ -186,8 +226,9 @@ elif pagina_seleccionada == pagina_personajes:
            st.image("ricardo.png")
            
        with col2:    
-           st.markdown("<p style='text-align: justify;'>El performance puede ser visto como una forma de arte que busca transformar la relación entre el artista y el público, y desafiar la noción tradicional del arte como objeto. Como tal, el performance ha sido utilizado por artistas para abordar temas sociales, políticos y culturales, y para desafiar las normas sociales y estéticas.</p>", unsafe_allow_html=True)
-           
+           st.markdown("<p style='text-align: justify;'>Desde muy joven, Ricardo se había sentido atraído por el boxeo. La disciplina, el entrenamiento arduo y el desafío constante le fascinaban. Aunque la mayoría de la gente no lo sabía, Ricardo entrenaba en un gimnasio local después de sus clases y competía en combates de boxeo en su tiempo libre.</p>", unsafe_allow_html=True)
+           st.markdown("<p style='text-align: justify;'>Su pasión por el boxeo y su dedicación al deporte no pasaron desapercibidas. Pronto, Ricardo comenzó a destacarse en las competiciones amateur. Su técnica, su resistencia y su determinación eran insuperables. Su fama creció rápidamente y se convirtió en uno de los peleadores más respetados en la comunidad del boxeo.</p>", unsafe_allow_html=True)
+
     with tab3:
        
        col1, col2 =st.columns(2)
@@ -196,7 +237,9 @@ elif pagina_seleccionada == pagina_personajes:
            st.image("dis.png")
            
        with col2:
-           st.markdown("<p style='text-align: justify;'>El performance puede ser visto como una forma de arte que busca transformar la relación entre el artista y el público, y desafiar la noción tradicional del arte como objeto. Como tal, el performance ha sido utilizado por artistas para abordar temas sociales, políticos y culturales, y para desafiar las normas sociales y estéticas.</p>", unsafe_allow_html=True)
+           st.markdown("<p style='text-align: justify;'>Desde temprana edad, Yuli había mostrado una habilidad natural para las artes marciales. Su destreza y coordinación eran asombrosas, y su pasión por el combate la llevó a entrenar diligentemente en diversas disciplinas. A lo largo de los años, perfeccionó su técnica en estilos como el kung fu, el karate, la esgrima y muchas más.</p>", unsafe_allow_html=True)
+           st.markdown("<p style='text-align: justify;'>Con el tiempo, Yuli se ganó el respeto y la admiración de toda la comunidad universitaria. Su habilidad en las artes marciales era solo un aspecto de su personalidad, pero era su dedicación y pasión por enseñar lo que la convertía en una profesora excepcional.</p>", unsafe_allow_html=True)
+
     
     with tab4:
         
@@ -206,7 +249,10 @@ elif pagina_seleccionada == pagina_personajes:
             st.image("elvis.png")
         
         with col2:
-            st.markdown("<p style='text-align: justify;'>El performance puede ser visto como una forma de arte que busca transformar la relación entre el artista y el público, y desafiar la noción tradicional del arte como objeto. Como tal, el performance ha sido utilizado por artistas para abordar temas sociales, políticos y culturales, y para desafiar las normas sociales y estéticas.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: justify;'>Desde muy joven, Elvis fue cautivado por el mundo de la lucha libre. Se deleitaba con las acrobacias, los movimientos espectaculares y la emoción que rodeaba a este deporte. Mientras construía su imperio en las telecomunicaciones, Elvis también entrenaba en secreto, perfeccionando su técnica y desarrollando su físico para competir en el mundo de la lucha libre profesional.</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: justify;'>A pesar de sus compromisos empresariales, Elvis siempre encontraba tiempo para asistir a eventos de lucha libre y estudiar las tácticas de los mejores luchadores. Aprovechaba cada oportunidad para aprender y mejorar, y pronto se dio cuenta de que tenía un talento innato para el deporte. Con su gran fortuna, pudo contratar a los mejores entrenadores y acceder a las mejores instalaciones para perfeccionar su técnica.</p>", unsafe_allow_html=True)
+
+            
 
     st.markdown("<h1 style='text-align: center;'>¡¡Mientras te adentras en este mundo!!</h1>", unsafe_allow_html=True)
     
@@ -220,70 +266,33 @@ elif pagina_seleccionada == pagina_personajes:
     
     st.audio(audiobytes2, format='audio/mp3')
     
-    conn = sqlite3.connect('comentarios.db')
-    c= conn.cursor()
     
-    c.execute('''CREATE TABLE IF NOT EXISTS comentarios
-              (id INTEGER PRIMARY KEY AUTOINCREMENT, comentario TEXT)''')
-    
-    conn.commit()
-    
-    def agregar_comentario(comentario):
-        c.execute("INSERT INTO Ccomentarios (comentario) VALUES (?)", (comentario))
-        conn.commit()
         
-    def obtener_comentarios():
-        c.execute("SELECT * FROM comentarios")
-        comentarios = c.fetchall()
-        return comentarios
+elif pagina_seleccionada == pagina_prueba:
     
-    def main():
-        st.title("¡DEJANOS TU COMENTARIO AQUI!")
-        
-        comentarios = obtener_comentarios()
-        
-        if comentarios:
-            st.header("Conoce lo que dice nuestra comunidad:")
-            
-            for comentario in comentarios:
-                st.write(comentario[1])
-        else:
-            st.write("No hay comentarios aún.")
-            
-        st.header("Agregar nuevo comentario")
-        nuevo_comentario = st.text_input("Escribe tu comentario aquí")
-        if st.button("Enviar"):
-            if nuevo_comentario:
-                agregar_comentario(nuevo_comentario)
-                st.success("¡¡Gracias por tu aporte!!")
-            else:
-                st.warnig("Queremos conocer tu opinión.")
-                
-    if __name__ == '__main__':
-        main()
-    
-     
-    
-    
+    st.markdown("<h3 style='text-align: Left; color: Gray;'>Deja una reseña</h3>", unsafe_allow_html=True)
+    st.markdown("<h5 style='text-align: Left; color: Gray;'>Comentario:</h5>", unsafe_allow_html=True)
+    user = st.text_input('Usuario: ', '')
+    title = st.text_input('titulo: ', '')
+    comment = st.text_input('Comentario: ', '')
+    if st.button('Enviar reseña'):
+         st.write('Gracias por su reseña')
+         data = [user, title, comment ]
+         worksheet.append_row(data)
+    st.markdown("<h3 style='text-align: Left; color: Gray;'>Reviews</h3>", unsafe_allow_html=True)
+     # Print results.
+    for title, comment, rating in zip(user_values, title_values, comment_values):
+         row = RowData(title, comment, rating)
+         rows.append(row)
+    for row in rows:
+         if(row.user != "user"):
+             st.divider()
+             st.subheader(f"{row.user}")
+             st.subheader(f"{row.title}")
+             st.write(f"{row.comment}")
 
 
        
-       
-
-          
-       
-        
-    
-    
-    
-    
-    st.markdown("<p style='text-align: justify;'></p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: justify;'></p>", unsafe_allow_html=True)
-
-
-
-   
-    
 
     
    
